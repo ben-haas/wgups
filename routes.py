@@ -32,19 +32,37 @@ def load_address_data():
         return address_list
 
 
-def calc_distance(address1, address2):
-    addresses = load_address_data()
-    distances = load_distance_data()
-    index_1 = 0
-    index_2 = 0
+def get_address_index(address, address_list):
+    idx = 0
 
-    for row in addresses:
-        if address1 in row:
-            index_1 = addresses.index(row)
-        if address2 in row:
-            index_2 = addresses.index(row)
+    for row in address_list:
+        if address in row:
+            idx = address_list.index(row)
 
-    if distances[index_1][index_2]:
-        return distances[index_1][index_2]
+    return idx
+
+
+def calc_distance(idx_1, idx_2, distance_list):
+    if distance_list[idx_1][idx_2]:
+        return distance_list[idx_1][idx_2]
     else:
-        return distances[index_2][index_1]
+        return distance_list[idx_2][idx_1]
+
+
+def min_distance_from(from_address, truck_pkg_id_list, ht, address_list, distance_list):
+    min_distance = float("inf")
+    min_address = None
+    from_index = get_address_index(from_address, address_list)
+
+    for id in truck_pkg_id_list:
+        address = ht.lookup(id).address
+
+        if from_address != address:
+            dist = calc_distance(
+                from_index, get_address_index(address, address_list), distance_list
+            )
+            if dist < min_distance:
+                min_distance = dist
+                min_address = address
+
+    return min_address
