@@ -1,4 +1,4 @@
-# Benjamin Haas Student ID: 011196046
+# Benjamin Haas Student ID: 11196046
 
 import csv
 from package import Package
@@ -16,9 +16,3 @@ class Main:
             pkg = Package(row)
             ht.insert(pkg.id, pkg)
             print(ht.lookup(pkg.id))
-
-    with open("./data/addresses.csv", mode="r") as file:
-        reader = csv.reader(file)
-
-    with open("./data/distances.csv", mode="r") as file:
-        reader = csv.reader(file)
