@@ -51,6 +51,7 @@ def calc_distance(idx_1, idx_2, distance_list):
 
 def min_distance_from(from_address, truck_pkg_id_list, ht, address_list, distance_list):
     min_distance = float("inf")
+    min_id = None
     min_address = None
     from_index = get_address_index(from_address, address_list)
 
@@ -64,5 +65,6 @@ def min_distance_from(from_address, truck_pkg_id_list, ht, address_list, distanc
             if dist < min_distance:
                 min_distance = dist
                 min_address = address
+                min_id = id
 
-    return min_address
+    return [min_id, min_distance, min_address]
