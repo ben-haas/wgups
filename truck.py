@@ -19,7 +19,7 @@ class Truck:
     def __init__(
         self,
         id,
-        depart_time,
+        depart_time=timedelta(hours=8),
         max_cargo=max_cargo,
         avg_speed=avg_speed,
         hub_address="4001 S 700 E",
@@ -35,13 +35,15 @@ class Truck:
         self.hub_address = hub_address
         self.traveled_timestamps = []
 
-    def load_package(self, pkg_id, ht):
-        if len(self.pkg_list) < self.max_cargo:
-            self.pkg_list.append(pkg_id)
-            pkg = ht.lookup(pkg_id)
-            pkg.truck_id = self.id
-        else:
-            return False
+    def load_packages(self, pkg_id_list, ht):
+        for id in pkg_id_list:
+            if len(self.pkg_list) < self.max_cargo:
+                self.pkg_list.append(id)
+                pkg = ht.lookup(id)
+                pkg.truck_id = self.id
+                self.status = TruckStatus.LOADED
+            else:
+                raise ValueError("Truck is full")
 
     def update_status(self, new_status):
         if isinstance(new_status, TruckStatus):
@@ -70,9 +72,11 @@ class Truck:
     def deliver_all_packages(self, ht, address_list, distance_list):
         if self.status == TruckStatus.LOADED:
             self.update_status(TruckStatus.DELIVERING)
+            for id in self.pkg_list:
+                ht.lookup(id).update_status(PackageStatus.EN_ROUTE)
             from_address = self.hub_address
 
-            while len(self.pkg_list) != 0:
+            while len(self.pkg_list) > 0:
                 next_stop = routes.find_next_stop(
                     from_address, self.pkg_list, ht, address_list, distance_list
                 )
@@ -81,4 +85,5 @@ class Truck:
                 self.deliver_package(next_stop[1], ht, next_stop[0], time_elapsed)
                 from_address = ht.lookup(next_stop[1]).address
 
+            self.status = TruckStatus.RETURNING
             self.return_to_hub(from_address, address_list, distance_list)

@@ -29,15 +29,18 @@ def get_address_index(address, address_list):
 
 def calc_distance(idx_1, idx_2, distance_list):
     if distance_list[idx_1][idx_2] != "":
-        return float(distance_list[idx_1][idx_2])
+        return round(float(distance_list[idx_1][idx_2]), 2)
     else:
-        return float(distance_list[idx_2][idx_1])
+        return round(float(distance_list[idx_2][idx_1]), 2)
 
 
 def find_next_stop(from_address, pkg_list, ht, address_list, distance_list):
     min_distance = float("inf")
-    min_pkg = None
+    next_pkg = None
     from_index = get_address_index(from_address, address_list)
+
+    if len(pkg_list) == 1:
+        return [0, pkg_list[0]]
 
     for id in pkg_list:
         address = ht.lookup(id).address
@@ -46,8 +49,8 @@ def find_next_stop(from_address, pkg_list, ht, address_list, distance_list):
             dist = calc_distance(
                 from_index, get_address_index(address, address_list), distance_list
             )
-            if dist < min_distance:
+            if dist <= min_distance:
                 min_distance = dist
-                min_pkg = id
+                next_pkg = id
 
-    return [min_distance, min_pkg]
+    return [min_distance, next_pkg]
