@@ -1,4 +1,67 @@
 import csv
+import datetime
+from hub import ConstraintType
+from package import Package, PackageStatus
+
+
+def load_package_data(csv_file, pkg_table, hub):
+    with open(csv_file, mode="r", encoding="utf-8-sig", newline="") as file:
+        reader = csv.reader(file)
+
+        for row in reader:
+            deadline = None
+            if row[5] == "EOD":
+                deadline = datetime.timedelta(hours=17)
+            else:
+                if len(row[5]) == 4:
+                    deadline = datetime.timedelta(
+                        hours=int(row[5][:2]), minutes=int(row[5][-2:])
+                    )
+                else:
+                    deadline = datetime.timedelta(
+                        hours=int(row[5][:1]), minutes=int(row[5][-2:])
+                    )
+
+            pkg = Package(
+                int(row[0]),
+                row[1],
+                row[2],
+                row[3],
+                row[4],
+                deadline,
+                int(row[6]),
+                row[7],
+            )
+
+            if "DELAYED" in pkg.notes:
+                pkg.update_status(PackageStatus.DELAYED)
+
+                time = pkg.notes[-4:]
+                hours = int(time[:2].strip())
+                minutes = int(time[-2:].strip())
+                pkg.at_hub_time = datetime.timedelta(hours=hours, minutes=minutes)
+
+                hub.add_delayed_package(pkg.id)
+            elif "ADDRESS_ISSUE" in pkg.notes:
+                pkg.update_status(PackageStatus.DELAYED)
+
+                time = pkg.notes[-4:]
+                hours = int(time[:2].strip())
+                minutes = int(time[-2:].strip())
+                pkg.at_hub_time = datetime.timedelta(hours=hours, minutes=minutes)
+
+                hub.add_delayed_package(pkg.id)
+            elif "TRUCK" in pkg.notes:
+                pkg.update_status(PackageStatus.CONSTRAINED)
+                truck = pkg.notes[-1:]
+                hub.add_constrained_package(pkg.id, ConstraintType.TRUCK, truck)
+            elif "GROUPED" in pkg.notes:
+                pkg.update_status(PackageStatus.CONSTRAINED)
+                hub.add_constrained_package(pkg.id, ConstraintType.GROUPED, pkg.notes)
+            else:
+                hub.add_deliverable_package(pkg.id)
+
+            pkg_table.insert(pkg.id, pkg)
 
 
 def load_distance_data(csv_file):
