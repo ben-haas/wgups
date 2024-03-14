@@ -4,6 +4,7 @@ from datetime import timedelta
 
 class PackageStatus(Enum):
     AT_HUB = auto()
+    CONSTRAINED = auto()
     EN_ROUTE = auto()
     DELIVERED = auto()
     DELAYED = auto()
