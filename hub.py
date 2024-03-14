@@ -1,6 +1,11 @@
 from datetime import timedelta
-
+from enum import Enum, auto
 from package import PackageStatus
+
+
+class ConstraintType(Enum):
+    TRUCK = auto()
+    GROUPED = auto()
 
 
 class Hub:
@@ -9,7 +14,8 @@ class Hub:
         self.trucks = []
         self.deliverable_packages = []
         self.delayed_packages = []
-        self.hub_time = timedelta(hours=7)
+        self.constrained_packages = []
+        self.hub_time = timedelta(hours=8)
 
     def add_truck(self, truck):
         self.trucks.append(truck)
@@ -19,6 +25,9 @@ class Hub:
 
     def add_delayed_package(self, pkg_id):
         self.delayed_packages.append(pkg_id)
+
+    def add_constrained_package(self, pkg_id, constraint_type, constraint):
+        self.constrained_packages.append([pkg_id, constraint_type, constraint])
 
     def update_hub_time(self, hours, minutes=0, seconds=0):
         self.hub_time = timedelta(hours=hours, minutes=minutes, seconds=seconds)
@@ -31,3 +40,15 @@ class Hub:
                 pkg.update_status(PackageStatus.AT_HUB)
                 self.delayed_packages.remove(id)
                 self.deliverable_packages.append(id)
+
+    def __str__(self):
+        return (
+            f"------------------------------\n"
+            f"Hub Address: {self.address}\n"
+            f"Assigned Trucks: {self.trucks}\n"
+            f"Deliverable Packages: {self.deliverable_packages}\n"
+            f"Constrained Packages: {self.constrained_packages}\n"
+            f"Delayed Packages: {self.delayed_packages}\n"
+            f"Hub Time: {self.hub_time}\n"
+            f"------------------------------\n"
+        )
