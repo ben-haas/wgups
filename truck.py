@@ -87,3 +87,14 @@ class Truck:
 
             self.status = TruckStatus.RETURNING
             self.return_to_hub(from_address, address_list, distance_list)
+
+    def __str__(self):
+        return (
+            f"----------------------\n"
+            f"ID: {self.id}\n"
+            f"Package List: {self.pkg_list}\n"
+            f"Status: {self.status}\n"
+            f"Miles Traveled: {self.miles_traveled}\n"
+            f"Truck Time: {self.truck_time}\n"
+            f"----------------------\n"
+        )
