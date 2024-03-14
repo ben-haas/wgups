@@ -42,3 +42,9 @@ class HashTable:
             if k == key:
                 return v
         return None
+
+    def print_all_values(self):
+        for bucket in self.table:
+            for item in bucket:
+                _, value = item
+                print(value)
