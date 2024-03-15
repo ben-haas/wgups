@@ -103,7 +103,7 @@ def find_next_stop(from_address, pkg_list, ht, address_list, distance_list):
     from_index = get_address_index(from_address, address_list)
 
     if len(pkg_list) == 1:
-        return [0, pkg_list[0]]
+        return pkg_list[0]
 
     for id in pkg_list:
         address = ht.lookup(id).address
@@ -116,4 +116,4 @@ def find_next_stop(from_address, pkg_list, ht, address_list, distance_list):
                 min_distance = dist
                 next_pkg = id
 
-    return [min_distance, next_pkg]
+    return next_pkg
