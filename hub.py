@@ -44,10 +44,50 @@ class Hub:
                 self.delayed_packages.remove(id)
                 self.deliverable_packages.append(id)
 
-    def load_available_trucks(self, pkg_ht, address_list, distance_list):
-        temp_list = self.deliverable_packages
+    def merge_grouped_packages(self, pkg_sets):
+        # convert the list of lists to a list of sets
+        pkg_sets = [set(pkgs) for pkgs in pkg_sets]
+        merged = True
+
+        while merged:
+            merged = False
+            for i in range(len(pkg_sets)):
+                for j in range(i + 1, len(pkg_sets)):
+                    # If 2 sets overlap, merge them
+                    # isdisjoint() is False if at least one element is common to both sets
+                    if not pkg_sets[i].isdisjoint(pkg_sets[j]):
+                        # Union to merge the sets
+                        pkg_sets[i] |= pkg_sets[j]
+                        # Empty the set that was merged into the other set
+                        pkg_sets[j] = set()
+                        merged = True
+
+            # remove any empty sets by checking each one for a truthy value
+            pkg_sets = [s for s in pkg_sets if s]
+
+        # convert the sets back to lists
+        return [list(s) for s in pkg_sets]
+
+    def parse_grouped_packages(self, pkg_list, pkg_ht):
+        pkg_sets = []
+        for id in pkg_list:
+            grouped_ids = pkg_ht.lookup(id).notes.replace("GROUPED -", "").split("+")
+            grouped_ids.append(id)
+            int_list = [int(id) for id in grouped_ids]
+
+            pkg_sets.append(int_list)
+
+        merged_sets = self.merge_grouped_packages(pkg_sets)
+        print(merged_sets)
+
+        return merged_sets
+
+    def sort_packages(self, pkg_list, pkg_ht, address_list, distance_list):
+
+        temp_list = pkg_list
         sorted_list = []
         from_address = self.address
+
         while len(temp_list) > 0:
             next_stop = routes.find_next_stop(
                 from_address,
@@ -61,11 +101,17 @@ class Hub:
             sorted_list.append(next_stop)
 
         print(sorted_list)
-        print(
-            len(sorted_list)
-            + len(self.delayed_packages)
-            + len(self.constrained_packages)
-        )
+
+    def load_available_trucks(self, pkg_ht, truck_ht, address_list, distance_list):
+        grouped_list = []
+        for pkg in self.constrained_packages:
+            if pkg_ht.lookup(pkg[0]).notes.startswith("GROUPED -"):
+                grouped_list.append(pkg[0])
+        self.parse_grouped_packages(grouped_list, pkg_ht)
+
+    def dispatch_truck(self, truck_id, truck_ht):
+        # TODO: trigger truck delivery
+        print("Deliver Packages on Truck", truck_id)
 
     def __str__(self):
         return (
