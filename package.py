@@ -55,12 +55,9 @@ class Package:
             f"Package ID: {self.id}\n"
             f"Address: {self.address}, {self.city}, {self.state} {self.zip}\n"
             f"Deadline: {self.deadline}\n"
-            f"Weight: {self.weight}\n"
-            f"Notes: {self.notes}\n"
             f"Status: {self.status.name}\n"
             f"Truck ID: {self.truck_id if self.truck_id is not None else 'N/A'}\n"
             f"At Hub Time: {self.at_hub_time}\n"
             f"Delivery Time: {self.delivery_time if self.delivery_time is not None else 'N/A'}\n"
-            f"En Route Time: {self.en_route_time if self.en_route_time is not None else 'N/A'}\n"
             f"------------------------------------\n"
         )

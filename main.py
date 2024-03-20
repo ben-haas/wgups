@@ -9,7 +9,7 @@ from hub import Hub
 
 pkg_table = HashTable()
 truck_table = HashTable()
-hub = Hub()
+hub = Hub(2)
 
 address_list = routes.load_address_data("./data/addresses.csv")
 distance_list = routes.load_distance_data("./data/distances.csv")
@@ -26,6 +26,7 @@ def create_trucks(truck_qty):
 
 class Main:
     create_trucks(3)
+    hub.load_available_trucks(pkg_table, truck_table, address_list, distance_list)
 
     print("-------------------------------------------")
     print("Western Governors University Parcel Service")
@@ -35,3 +36,4 @@ class Main:
     print('                 -"-"-')
     print("-------------------------------------------")
     print()
+    print(truck_table.print_all_values())

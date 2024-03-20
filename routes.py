@@ -33,6 +33,8 @@ def load_package_data(csv_file, pkg_table, hub):
                 row[7],
             )
 
+            hub.add_package(pkg.id)
+
             if "DELAYED" in pkg.notes:
                 pkg.update_status(PackageStatus.DELAYED)
 
@@ -53,11 +55,10 @@ def load_package_data(csv_file, pkg_table, hub):
                 hub.add_delayed_package(pkg.id)
             elif "TRUCK" in pkg.notes:
                 pkg.update_status(PackageStatus.CONSTRAINED)
-                truck = pkg.notes[-1:]
-                hub.add_constrained_package(pkg.id, ConstraintType.TRUCK, truck)
+                hub.add_constrained_package(pkg.id, ConstraintType.TRUCK)
             elif "GROUPED" in pkg.notes:
                 pkg.update_status(PackageStatus.CONSTRAINED)
-                hub.add_constrained_package(pkg.id, ConstraintType.GROUPED, pkg.notes)
+                hub.add_constrained_package(pkg.id, ConstraintType.GROUPED)
             else:
                 hub.add_deliverable_package(pkg.id)
 
